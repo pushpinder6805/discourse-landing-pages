@@ -1,23 +1,18 @@
 import AceEditor from "discourse/components/ace-editor";
+import { bind } from "discourse/lib/decorators";
 
 export default class JsonEditor extends AceEditor {
   mode = "json";
-  htmlPlaceholder = true;
 
-  _overridePlaceholder(loadedAce) {
+  @bind
+  setupAce(element) {
     const pluginAcePath = "/plugins/discourse-landing-pages/javascripts/ace";
-    loadedAce.config.set("modePath", pluginAcePath);
-    loadedAce.config.set("workerPath", pluginAcePath);
-    super._overridePlaceholder(...arguments);
-  }
-
-  didRender() {
-    super.didRender(...arguments);
-    if (this._editor) {
-      this._editor.setOptions({
-        useWorker: true,
-        wrap: true,
-      });
-    }
+    this.ace.config.set("modePath", pluginAcePath);
+    this.ace.config.set("workerPath", pluginAcePath);
+    super.setupAce(element);
+    this.editor.setOptions({
+      useWorker: true,
+      wrap: true,
+    });
   }
 }

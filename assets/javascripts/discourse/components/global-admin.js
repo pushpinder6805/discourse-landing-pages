@@ -1,14 +1,13 @@
 import Component from "@ember/component";
 import { action } from "@ember/object";
-import { or } from "@ember/object/computed";
+import discourseComputed from "discourse/lib/decorators";
 import LandingPageGlobal from "../models/landing-page-global";
 
-export default Component.extend({
-  updatingGlobal: or("destroyingGlobal", "savingGlobal"),
-
+export default class GlobalAdmin extends Component {
   didReceiveAttrs() {
+    super.didReceiveAttrs(...arguments);
     this.initializeProps();
-  },
+  }
 
   initializeProps() {
     this.setProperties({
@@ -16,7 +15,12 @@ export default Component.extend({
       jsonHeader: JSON.stringify(this.global?.header || undefined, null, 4),
       jsonFooter: JSON.stringify(this.global?.footer || undefined, null, 4),
     });
-  },
+  }
+
+  @discourseComputed("destroyingGlobal", "savingGlobal")
+  updatingGlobal(destroyingGlobal, savingGlobal) {
+    return destroyingGlobal || savingGlobal;
+  }
 
   @action
   saveGlobal() {
@@ -71,7 +75,7 @@ export default Component.extend({
         setTimeout(() => this.set("resultIcon", null), 10000);
       })
       .finally(() => this.set("savingGlobal", false));
-  },
+  }
 
   @action
   destroyGlobal() {
@@ -91,5 +95,5 @@ export default Component.extend({
         setTimeout(() => this.set("resultIcon", null), 10000);
       })
       .finally(() => this.set("destroyingGlobal", false));
-  },
-});
+  }
+}

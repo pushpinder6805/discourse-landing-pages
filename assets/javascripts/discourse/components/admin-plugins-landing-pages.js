@@ -1,30 +1,76 @@
+import Component from "@ember/component";
+import EmberObject, { action } from "@ember/object";
+import { service } from "@ember/service";
+import { ajax } from "discourse/lib/ajax";
+import { extractError } from "discourse/lib/ajax-error";
+import discourseComputed from "discourse/lib/decorators";
+import Group from "discourse/models/group";
+import { i18n } from "discourse-i18n";
 import ImportPages from "../components/modal/import-pages";
 import UpdatePagesRemote from "../components/modal/update-pages-remote";
-import Controller from "@ember/controller";
-import { inject as service } from "@ember/service";
-import discourseComputed from "discourse-common/utils/decorators";
-import { gt, not, notEmpty, or } from "@ember/object/computed";
-import { extractError } from "discourse/lib/ajax-error";
-import { ajax } from "discourse/lib/ajax";
-import I18n from "I18n";
-import { action } from "@ember/object";
 
 const statusIcons = {
   error: "exclamation-triangle",
   success: "check",
 };
 
-export default Controller.extend({
-  modal: service(),
+export default class AdminPluginsLandingPages extends Component {
+  @service modal;
 
-  remoteDisconnected: not("remote.connected"),
-  pullDisabled: or("pullingFromRemote", "remoteDisconnected"),
-  fetchingCommits: false,
-  commitsBehind: null,
-  hasCommitsBehind: gt("commitsBehind", 0),
-  hasMessages: notEmpty("messages.items"),
-  showCommitsBehind: false,
-  showPages: true,
+  fetchingCommits = false;
+  commitsBehind = null;
+  showCommitsBehind = false;
+  showPages = true;
+
+  didReceiveAttrs() {
+    super.didReceiveAttrs(...arguments);
+    const model = this.get("model");
+    this.setProperties({
+      pages: model.pages,
+      menus: model.menus,
+      remote: EmberObject.create(model.remote || {}),
+      themes: model.themes,
+      groups: model.groups,
+      global: model.global,
+    });
+
+    if (model.remote) {
+      if (model.remote.commit) {
+        this.send("fetchCommitsBehind");
+      } else {
+        this.set("pagesNotFetched", true);
+      }
+    }
+
+    ajax("/admin/themes").then((result) =>
+      this.set(
+        "themes",
+        result.themes.map((t) => ({ id: t.id, name: t.name }))
+      )
+    );
+
+    Group.findAll().then((groups) => this.set("groups", groups));
+  }
+
+  @discourseComputed("remote.connected")
+  remoteDisconnected(connected) {
+    return !connected;
+  }
+
+  @discourseComputed("pullingFromRemote", "remoteDisconnected")
+  pullDisabled(pullingFromRemote, remoteDisconnected) {
+    return pullingFromRemote || remoteDisconnected;
+  }
+
+  @discourseComputed("commitsBehind")
+  hasCommitsBehind(commitsBehind) {
+    return commitsBehind > 0;
+  }
+
+  @discourseComputed("messages.items")
+  hasMessages(items) {
+    return items && items.length > 0;
+  }
 
   @discourseComputed("staticMessage", "resultMessages")
   messages(staticMessage, resultMessages) {
@@ -55,7 +101,7 @@ export default Controller.extend({
     } else {
       return null;
     }
-  },
+  }
 
   @discourseComputed(
     "pagesNotFetched",
@@ -101,18 +147,18 @@ export default Controller.extend({
     if (key) {
       return {
         icon,
-        text: I18n.t(`admin.landing_pages.${key}`),
+        text: i18n(`admin.landing_pages.${key}`),
       };
     } else {
       return null;
     }
-  },
+  }
 
   @discourseComputed("showGlobal")
   documentationUrl(showGlobal) {
     const rootUrl = "https://coop.pavilion.tech";
     return showGlobal ? `${rootUrl}` : `${rootUrl}`;
-  },
+  }
 
   @action
   importPages() {
@@ -123,13 +169,13 @@ export default Controller.extend({
           resultMessages: {
             type: "success",
             messages: [
-              I18n.t("admin.landing_pages.imported.x_pages", { count: 1 }),
+              i18n("admin.landing_pages.imported.x_pages", { count: 1 }),
             ],
           },
         });
       }
     });
-  },
+  }
 
   @action
   updateRemote() {
@@ -143,7 +189,7 @@ export default Controller.extend({
           });
         }
       });
-  },
+  }
 
   @action
   pullFromRemote() {
@@ -174,7 +220,7 @@ export default Controller.extend({
           ["scripts", "menus", "assets", "pages"].forEach((listType) => {
             if (imported[listType].length) {
               messages.push(
-                I18n.t(`admin.landing_pages.imported.x_${listType}`, {
+                i18n(`admin.landing_pages.imported.x_${listType}`, {
                   count: imported[listType].length,
                 })
               );
@@ -183,7 +229,7 @@ export default Controller.extend({
 
           ["footer", "header"].forEach((boolType) => {
             if (imported[boolType]) {
-              messages.push(I18n.t(`admin.landing_pages.imported.${boolType}`));
+              messages.push(i18n(`admin.landing_pages.imported.${boolType}`));
             }
           });
 
@@ -192,7 +238,7 @@ export default Controller.extend({
             pagesNotFetched: false,
           });
 
-          this.send("commitsBehind");
+          this.send("fetchCommitsBehind");
         }
       })
       .catch((error) => {
@@ -204,10 +250,10 @@ export default Controller.extend({
       .finally(() => {
         this.set("pullingFromRemote", false);
       });
-  },
+  }
 
   @action
-  commitsBehind() {
+  fetchCommitsBehind() {
     this.set("fetchingCommits", true);
 
     ajax("/landing/remote/commits-behind")
@@ -219,12 +265,12 @@ export default Controller.extend({
       .finally(() => {
         this.set("fetchingCommits", false);
       });
-  },
+  }
 
   @action
   updatePages(pages) {
     this.set("pages", pages);
-  },
+  }
 
   @action
   toggleShowPages() {
@@ -232,7 +278,7 @@ export default Controller.extend({
       showPages: true,
       showGlobal: false,
     });
-  },
+  }
 
   @action
   toggleShowGlobal() {
@@ -240,5 +286,5 @@ export default Controller.extend({
       showPages: false,
       showGlobal: true,
     });
-  },
-});
+  }
+}

@@ -1,12 +1,12 @@
 import EmberObject from "@ember/object";
 import { ajax } from "discourse/lib/ajax";
-import { url } from "discourse/lib/computed";
 import { popupAjaxError } from "discourse/lib/ajax-error";
+import { url } from "discourse/lib/computed";
 
 const basePath = "/landing/page";
 
-const LandingPage = EmberObject.extend({
-  exportUrl: url("id", `${basePath}/%@/export`),
+class LandingPage extends EmberObject {
+  exportUrl = url("id", `${basePath}/%@/export`);
 
   save() {
     const path = this.id ? `${basePath}/${this.id}` : basePath;
@@ -28,13 +28,13 @@ const LandingPage = EmberObject.extend({
       contentType: "application/json; charset=UTF-8",
       data: JSON.stringify(page),
     });
-  },
+  }
 
   destroy() {
     return ajax(`${basePath}/${this.id}`, {
       type: "DELETE",
     }).catch(popupAjaxError);
-  },
+  }
 
   export() {
     return ajax(this.exportUrl, {
@@ -44,8 +44,8 @@ const LandingPage = EmberObject.extend({
         responseType: "blob",
       },
     });
-  },
-});
+  }
+}
 
 LandingPage.reopenClass({
   all() {

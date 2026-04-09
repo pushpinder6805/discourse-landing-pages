@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 class LandingPages::BasicPageSerializer < ::ApplicationSerializer
-  attributes :id, :name, :path
+  attributes :id, :parent_id, :name, :path
 end

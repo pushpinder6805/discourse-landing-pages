@@ -1,58 +1,66 @@
 import Component from "@ember/component";
+import { action } from "@ember/object";
+import { observes } from "@ember-decorators/object";
+import BufferedProxy from "ember-buffered-proxy/proxy";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import discourseComputed, { observes } from "discourse-common/utils/decorators";
-import BufferedProxy from "ember-buffered-proxy/proxy";
-import { and, or } from "@ember/object/computed";
-import { action } from "@ember/object";
+import discourseComputed from "discourse/lib/decorators";
 
-export default Component.extend({
-  keyGenUrl: "/admin/themes/generate_key_pair",
-  remoteUrl: "/landing/remote",
-  httpsPlaceholder: "https://github.com/org/repo",
-  sshPlaceholder: "git@github.com:org/repo.git",
-  showPublicKey: and("buffered.private", "buffered.public_key"),
-  testing: false,
-  updating: false,
-  resetting: false,
-  loading: or("testing", "updating", "resetting"),
+export default class UpdatePagesRemote extends Component {
+  keyGenUrl = "/admin/themes/generate_key_pair";
+  remoteUrl = "/landing/remote";
+  httpsPlaceholder = "https://github.com/org/repo";
+  sshPlaceholder = "git@github.com:org/repo.git";
+  testing = false;
+  updating = false;
+  resetting = false;
+
+  @discourseComputed("buffered.private", "buffered.public_key")
+  showPublicKey(privateKey, publicKey) {
+    return privateKey && publicKey;
+  }
+
+  @discourseComputed("testing", "updating", "resetting")
+  loading(testing, updating, resetting) {
+    return testing || updating || resetting;
+  }
 
   @discourseComputed("model.remote")
   buffered(remote) {
     return BufferedProxy.create({
       content: remote,
     });
-  },
+  }
 
   @discourseComputed("tested", "loading")
   updateDisabled(tested, loading) {
     return tested !== "success" || loading;
-  },
+  }
 
   @discourseComputed("buffered.connected", "loading")
   resetDisabled(connected, loading) {
     return !connected || loading;
-  },
+  }
 
   @discourseComputed("buffered.url", "loading")
   testDisabled(url, loading) {
     return !url || loading;
-  },
+  }
 
   @discourseComputed("buffered.private")
   urlPlaceholder(isPrivate) {
     return isPrivate ? this.sshPlaceholder : this.httpsPlaceholder;
-  },
+  }
 
   @discourseComputed("tested")
   testIcon(tested) {
     return tested === "success" ? "check" : tested === "error" ? "xmark" : null;
-  },
+  }
 
   @observes("buffered.hasChanges")
   remoteChanged() {
     this.set("tested", null);
-  },
+  }
 
   @observes("buffered.private")
   privateWasChecked() {
@@ -73,7 +81,7 @@ export default Component.extend({
         .catch(popupAjaxError)
         .finally(() => this.set("_keyLoading", false));
     }
-  },
+  }
 
   buildData() {
     this.buffered.applyChanges();
@@ -86,7 +94,7 @@ export default Component.extend({
         ...(remote.private && { public_key: remote.public_key }),
       },
     };
-  },
+  }
 
   @action
   test() {
@@ -101,7 +109,7 @@ export default Component.extend({
       })
       .catch(popupAjaxError)
       .finally(() => this.set("testing", false));
-  },
+  }
 
   @action
   update() {
@@ -117,7 +125,7 @@ export default Component.extend({
       })
       .catch(popupAjaxError)
       .finally(() => this.set("updating", false));
-  },
+  }
 
   @action
   reset() {
@@ -132,5 +140,5 @@ export default Component.extend({
       })
       .catch(popupAjaxError)
       .finally(() => this.set("resetting", false));
-  },
-});
+  }
+}

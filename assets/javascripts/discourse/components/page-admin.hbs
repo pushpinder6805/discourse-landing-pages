@@ -3,13 +3,13 @@
     <ComboBox
       @value={{this.page.id}}
       @content={{this.pages}}
-      @onChange={{action "changePage"}}
+      @onChange={{this.changePage}}
       class="page-select"
       @options={{hash none="admin.landing_pages.page.select"}}
     />
 
     <DButton
-      @action={{action "createPage"}}
+      @action={{this.createPage}}
       @label="admin.landing_pages.create"
       class="page-create"
       @icon="plus"
@@ -41,7 +41,7 @@
 
       {{#if this.page.id}}
         <DButton
-          @action={{action "exportPage"}}
+          @action={{this.exportPage}}
           @label="admin.landing_pages.page.export"
           @href={{this.page.exportUrl}}
           @disabled={{this.updatingPage}}
@@ -49,7 +49,7 @@
         />
 
         <DButton
-          @action={{action "destroyPage"}}
+          @action={{this.destroyPage}}
           @label="admin.landing_pages.destroy"
           @disabled={{this.updatingPage}}
           @icon="xmark"
@@ -57,7 +57,7 @@
       {{/if}}
 
       <DButton
-        @action={{action "savePage"}}
+        @action={{this.savePage}}
         @label="admin.landing_pages.save"
         class="btn-primary"
         @disabled={{this.updatingPage}}
@@ -94,7 +94,7 @@
       <Input
         @value={{readonly this.pagePath}}
         disabled={{this.hasParent}}
-        onInput={{action "onChangePath" value="target.value"}}
+        @onInput={{fn this.onChangePath value="target.value"}}
         class="page-path"
       />
 
@@ -111,7 +111,7 @@
       <ComboBox
         @value={{this.page.parent_id}}
         @content={{this.pages}}
-        @onChange={{action "onChangeParent"}}
+        @onChange={{this.onChangeParent}}
         class="page-select page-parent"
         @options={{hash none="admin.landing_pages.page.select"}}
       />
@@ -131,7 +131,7 @@
         @value={{this.page.menu}}
         @valueProperty="name"
         @nameProperty="name"
-        @onChange={{action (mut this.page.menu)}}
+        @onChange={{fn (mut this.page.menu)}}
         class="menu-select"
         @options={{hash none="admin.landing_pages.page.menu.select"}}
       />
@@ -151,7 +151,7 @@
       <ComboBox
         @content={{this.themes}}
         @value={{this.page.theme_id}}
-        @onChange={{action (mut this.page.theme_id)}}
+        @onChange={{fn (mut this.page.theme_id)}}
         @class="theme-select"
         @options={{hash none="admin.landing_pages.page.theme.select"}}
       />
@@ -171,7 +171,7 @@
         @content={{this.groups}}
         @value={{this.page.group_ids}}
         @labelProperty="name"
-        @onChange={{action (mut this.page.group_ids)}}
+        @onChange={{fn (mut this.page.group_ids)}}
       />
 
       <div class="control-instructions">
@@ -187,7 +187,7 @@
       <CategoryChooser
         @class="category-select"
         @value={{this.page.category_id}}
-        @onChange={{action (mut this.page.category_id)}}
+        @onChange={{fn (mut this.page.category_id)}}
         @options={{hash
           clearable=true
           disabled=this.hasParent

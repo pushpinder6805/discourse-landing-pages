@@ -1,19 +1,25 @@
 import Component from "@ember/component";
 import { action } from "@ember/object";
-import discourseComputed from "discourse-common/utils/decorators";
-import { notEmpty, or } from "@ember/object/computed";
 import { dasherize } from "@ember/string";
-import LandingPage from "../models/landing-page";
 import { extractError } from "discourse/lib/ajax-error";
-import I18n from "I18n";
+import discourseComputed from "discourse/lib/decorators";
+import { i18n } from "discourse-i18n";
+import LandingPage from "../models/landing-page";
 
 const location = window.location;
 const port = location.port ? ":" + location.port : "";
 const baseUrl = location.protocol + "//" + location.hostname + port;
 
-export default Component.extend({
-  updatingPage: or("destroyingPage", "savingPage"),
-  hasParent: notEmpty("parent"),
+export default class PageAdmin extends Component {
+  @discourseComputed("destroyingPage", "savingPage")
+  updatingPage(destroyingPage, savingPage) {
+    return destroyingPage || savingPage;
+  }
+
+  @discourseComputed("parent")
+  hasParent(parent) {
+    return !!parent;
+  }
 
   updateProps(props = {}) {
     const pages = props.pages || this.pages;
@@ -25,7 +31,7 @@ export default Component.extend({
       page = LandingPage.create(props.page);
     }
     this.set("page", page);
-  },
+  }
 
   showErrorMessage(error) {
     this.set("resultMessage", {
@@ -34,18 +40,18 @@ export default Component.extend({
       text: extractError(error),
     });
     setTimeout(() => this.set("resultMessage", null), 5000);
-  },
+  }
 
   @discourseComputed("page.parent_id")
   parent(parentId) {
-    const parent = this.pages.findBy("id", parentId);
+    const parent = this.pages.find((page) => page.id === parentId);
     return parent ? parent : null;
-  },
+  }
 
   @discourseComputed("page.path", "parent")
   pagePath(path, parent) {
     return parent ? parent.path : path;
-  },
+  }
 
   @discourseComputed("pagePath")
   pageUrl(pagePath) {
@@ -53,30 +59,30 @@ export default Component.extend({
     if (pagePath) {
       url += `/${dasherize(pagePath)}`;
     } else {
-      url += `/${I18n.t("admin.landing_pages.page.path.placeholder")}`;
+      url += `/${i18n("admin.landing_pages.page.path.placeholder")}`;
     }
     if (this.hasParent) {
       url += `/1`;
     }
     return url;
-  },
+  }
 
   @action
   onChangePath(path) {
     if (!this.page.parent_id) {
       this.set("page.path", path);
     }
-  },
+  }
 
   @action
   onChangeParent(pageId) {
     this.set("page.parent_id", pageId);
-  },
+  }
 
   @action
   createPage() {
     this.updateProps({ page: {} });
-  },
+  }
 
   @action
   changePage(pageId) {
@@ -85,7 +91,7 @@ export default Component.extend({
     } else {
       this.updateProps();
     }
-  },
+  }
 
   @action
   savePage() {
@@ -100,10 +106,23 @@ export default Component.extend({
       })
       .catch((error) => this.showErrorMessage(error))
       .finally(() => this.set("savingPage", false));
-  },
+  }
 
   @action
   destroyPage() {
+    const hasChildren = this.pages.find(
+      (page) => page.parent_id === this.page.id
+    );
+    if (hasChildren) {
+      this.set("resultMessage", {
+        style: "error",
+        icon: "xmark",
+        text: i18n("admin.landing_pages.page.destroy.has_children"),
+      });
+      setTimeout(() => this.set("resultMessage", null), 5000);
+      return;
+    }
+
     this.set("destroyingPage", true);
 
     this.page
@@ -115,7 +134,7 @@ export default Component.extend({
       })
       .catch((error) => this.showErrorMessage(error))
       .finally(() => this.set("destroyingPage", false));
-  },
+  }
 
   @action
   exportPage() {
@@ -131,5 +150,5 @@ export default Component.extend({
         link.click();
       })
       .catch((error) => this.showErrorMessage(error));
-  },
-});
+  }
+}

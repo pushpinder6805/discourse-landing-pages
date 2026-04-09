@@ -6,7 +6,7 @@
   <:body>
     <div class="url">
       <div class="label">{{i18n "admin.landing_pages.remote.url"}}</div>
-      <Input @value={{this.buffered.url}} placeholder={{urlPlaceholder}} />
+      <Input @value={{this.buffered.url}} placeholder={{this.urlPlaceholder}} />
     </div>
 
     <div class="branch">
@@ -21,7 +21,7 @@
       </label>
     </div>
 
-    {{#if showPublicKey}}
+    {{#if this.showPublicKey}}
       <div class="public-key">
         <div class="label">{{i18n "admin.customize.theme.public_key"}}</div>
         <Textarea readonly={{true}} @value={{this.buffered.public_key}} />
@@ -31,21 +31,21 @@
 
   <:footer>
     <DButton
-      @action={{action "update"}}
+      @action={{this.update}}
       @disabled={{this.updateDisabled}}
       class="btn btn-primary"
       @label="admin.landing_pages.remote.update"
     />
 
     <DButton
-      @action={{action "reset"}}
+      @action={{this.reset}}
       @disabled={{this.resetDisabled}}
       class="btn btn-danger"
       @label="admin.landing_pages.remote.reset"
     />
 
     <DButton
-      @action={{action "test"}}
+      @action={{this.test}}
       @disabled={{this.testDisabled}}
       class="btn btn-test"
       @label="admin.landing_pages.remote.test"

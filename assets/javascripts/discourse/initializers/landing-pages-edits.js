@@ -3,7 +3,7 @@ import DiscourseURL from "discourse/lib/url";
 export default {
   name: "landing-pages-edits",
   initialize(container) {
-    const site = container.lookup("site:main");
+    const site = container.lookup("service:site");
     const existing = DiscourseURL.routeTo;
 
     DiscourseURL.routeTo = function (url, opts) {
