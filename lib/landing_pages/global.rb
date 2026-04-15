@@ -33,7 +33,7 @@ class LandingPages::Global
         data[attr] = value
       end
 
-      PluginStore.set(LandingPages::PLUGIN_NAME, KEY, data)
+      PluginStore.set(LandingPages::PLUGIN_NAMESPACE, KEY, data)
     else
       false
     end
@@ -48,7 +48,7 @@ class LandingPages::Global
   end
 
   def self.find
-    if data = PluginStore.get(LandingPages::PLUGIN_NAME, KEY)
+    if data = PluginStore.get(LandingPages::PLUGIN_NAMESPACE, KEY)
       LandingPages::Global.new(data)
     else
       nil
@@ -56,7 +56,7 @@ class LandingPages::Global
   end
 
   def self.destroy
-    PluginStore.remove(LandingPages::PLUGIN_NAME, KEY)
+    PluginStore.remove(LandingPages::PLUGIN_NAMESPACE, KEY)
   end
 
   def self.scripts

@@ -94,7 +94,7 @@
       <Input
         @value={{readonly this.pagePath}}
         disabled={{this.hasParent}}
-        @onInput={{fn this.onChangePath value="target.value"}}
+        {{on "input" this.onChangePath}}
         class="page-path"
       />
 

@@ -62,7 +62,7 @@ class LandingPages::Asset
         data[attr] = value if value.present?
       end
 
-      PluginStore.set(LandingPages::PLUGIN_NAME, id, data)
+      PluginStore.set(LandingPages::PLUGIN_NAMESPACE, id, data)
     else
       false
     end
@@ -120,7 +120,7 @@ class LandingPages::Asset
   end
 
   def self.find(asset_id)
-    if data = PluginStore.get(LandingPages::PLUGIN_NAME, asset_id)
+    if data = PluginStore.get(LandingPages::PLUGIN_NAMESPACE, asset_id)
       asset = new(asset_id, data)
       asset.valid? ? asset : false
     else
@@ -154,7 +154,7 @@ class LandingPages::Asset
   end
 
   def self.destroy(asset_id)
-    PluginStore.remove(LandingPages::PLUGIN_NAME, asset_id)
+    PluginStore.remove(LandingPages::PLUGIN_NAMESPACE, asset_id)
   end
 
   def self.all
@@ -166,6 +166,6 @@ class LandingPages::Asset
   end
 
   def self.list_query
-    "plugin_name = '#{LandingPages::PLUGIN_NAME}' AND key LIKE '#{KEY}_%'"
+    "plugin_name = '#{LandingPages::PLUGIN_NAMESPACE}' AND key LIKE '#{KEY}_%'"
   end
 end

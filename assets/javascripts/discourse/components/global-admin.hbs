@@ -11,14 +11,14 @@
     {{conditional-loading-spinner condition=this.updatingGlobal size="small"}}
 
     {{d-button
-      action=(this.destroyGlobal)
+      action=this.destroyGlobal
       label="admin.landing_pages.destroy"
       disabled=this.updatingGlobal
       icon="xmark"
     }}
 
     {{d-button
-      action=(this.saveGlobal)
+      action=this.saveGlobal
       label="admin.landing_pages.save"
       class="btn-primary"
       disabled=this.updatingGlobal

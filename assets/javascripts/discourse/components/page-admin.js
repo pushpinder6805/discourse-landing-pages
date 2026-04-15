@@ -68,7 +68,8 @@ export default class PageAdmin extends Component {
   }
 
   @action
-  onChangePath(path) {
+  onChangePath(event) {
+    const path = event.target.value;
     if (!this.page.parent_id) {
       this.set("page.path", path);
     }

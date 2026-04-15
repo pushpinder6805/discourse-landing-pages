@@ -44,7 +44,7 @@ class LandingPages::Menu
         data[attr] = value if value.present?
       end
 
-      PluginStore.set(LandingPages::PLUGIN_NAME, id, data)
+      PluginStore.set(LandingPages::PLUGIN_NAMESPACE, id, data)
     else
       false
     end
@@ -61,7 +61,7 @@ class LandingPages::Menu
   end
 
   def self.find(menu_id)
-    if data = PluginStore.get(LandingPages::PLUGIN_NAME, menu_id)
+    if data = PluginStore.get(LandingPages::PLUGIN_NAMESPACE, menu_id)
       new(menu_id, data)
     else
       nil
@@ -92,11 +92,13 @@ class LandingPages::Menu
   end
 
   def self.exists?(menu_id)
-    PluginStoreRow.exists?("plugin_name = '#{LandingPages::PLUGIN_NAME}' AND key = 'menu_id'")
+    PluginStoreRow.exists?(
+      "plugin_name = '#{LandingPages::PLUGIN_NAMESPACE}' AND key = '#{menu_id}'",
+    )
   end
 
   def self.destroy(menu_id)
-    PluginStore.remove(LandingPages::PLUGIN_NAME, menu_id)
+    PluginStore.remove(LandingPages::PLUGIN_NAMESPACE, menu_id)
   end
 
   def self.all
@@ -111,6 +113,6 @@ class LandingPages::Menu
   end
 
   def self.menu_list_query
-    "plugin_name = '#{LandingPages::PLUGIN_NAME}' AND key LIKE '#{KEY}_%'"
+    "plugin_name = '#{LandingPages::PLUGIN_NAMESPACE}' AND key LIKE '#{KEY}_%'"
   end
 end
