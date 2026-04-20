@@ -1,8 +1,8 @@
-import Component from "@ember/component";
+import Component from "@glimmer/component";
+import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
 import { dasherize } from "@ember/string";
 import { extractError } from "discourse/lib/ajax-error";
-import discourseComputed from "discourse/lib/decorators";
 import { i18n } from "discourse-i18n";
 import LandingPage from "../models/landing-page";
 
@@ -11,53 +11,66 @@ const port = location.port ? ":" + location.port : "";
 const baseUrl = location.protocol + "//" + location.hostname + port;
 
 export default class PageAdmin extends Component {
-  @discourseComputed("destroyingPage", "savingPage")
-  updatingPage(destroyingPage, savingPage) {
-    return destroyingPage || savingPage;
+  @tracked page;
+  @tracked savingPage = false;
+  @tracked destroyingPage = false;
+  @tracked resultMessage;
+
+  get pages() {
+    return this.args.pages;
   }
 
-  @discourseComputed("parent")
-  hasParent(parent) {
-    return !!parent;
+  get themes() {
+    return this.args.themes;
+  }
+
+  get groups() {
+    return this.args.groups;
+  }
+
+  get menus() {
+    return this.args.menus;
+  }
+
+  get updatingPage() {
+    return this.destroyingPage || this.savingPage;
+  }
+
+  get hasParent() {
+    return !!this.parent;
   }
 
   updateProps(props = {}) {
-    const pages = props.pages || this.pages;
-    this.set("pages", pages);
-    this.updatePages(pages);
+    this.args.updatePages(props.pages || this.pages);
 
-    let page;
     if (props.page) {
-      page = LandingPage.create(props.page);
+      this.page = LandingPage.create(props.page);
+    } else {
+      this.page = null;
     }
-    this.set("page", page);
   }
 
   showErrorMessage(error) {
-    this.set("resultMessage", {
+    this.resultMessage = {
       style: "error",
       icon: "xmark",
       text: extractError(error),
-    });
-    setTimeout(() => this.set("resultMessage", null), 5000);
+    };
+    setTimeout(() => (this.resultMessage = null), 5000);
   }
 
-  @discourseComputed("page.parent_id")
-  parent(parentId) {
-    const parent = this.pages.find((page) => page.id === parentId);
-    return parent ? parent : null;
+  get parent() {
+    return this.pages.find((page) => page.id === this.page?.parent_id) || null;
   }
 
-  @discourseComputed("page.path", "parent")
-  pagePath(path, parent) {
-    return parent ? parent.path : path;
+  get pagePath() {
+    return this.parent ? this.parent.path : this.page?.path;
   }
 
-  @discourseComputed("pagePath")
-  pageUrl(pagePath) {
+  get pageUrl() {
     let url = baseUrl;
-    if (pagePath) {
-      url += `/${dasherize(pagePath)}`;
+    if (this.pagePath) {
+      url += `/${dasherize(this.pagePath)}`;
     } else {
       url += `/${i18n("admin.landing_pages.page.path.placeholder")}`;
     }
@@ -71,13 +84,13 @@ export default class PageAdmin extends Component {
   onChangePath(event) {
     const path = event.target.value;
     if (!this.page.parent_id) {
-      this.set("page.path", path);
+      this.page.path = path;
     }
   }
 
   @action
   onChangeParent(pageId) {
-    this.set("page.parent_id", pageId);
+    this.page.parent_id = pageId;
   }
 
   @action
@@ -96,7 +109,7 @@ export default class PageAdmin extends Component {
 
   @action
   savePage() {
-    this.set("savingPage", true);
+    this.savingPage = true;
 
     this.page
       .save()
@@ -106,25 +119,25 @@ export default class PageAdmin extends Component {
         }
       })
       .catch((error) => this.showErrorMessage(error))
-      .finally(() => this.set("savingPage", false));
+      .finally(() => (this.savingPage = false));
   }
 
   @action
   destroyPage() {
     const hasChildren = this.pages.find(
-      (page) => page.parent_id === this.page.id
+      (page) => page.parent_id === this.page.id,
     );
     if (hasChildren) {
-      this.set("resultMessage", {
+      this.resultMessage = {
         style: "error",
         icon: "xmark",
         text: i18n("admin.landing_pages.page.destroy.has_children"),
-      });
-      setTimeout(() => this.set("resultMessage", null), 5000);
+      };
+      setTimeout(() => (this.resultMessage = null), 5000);
       return;
     }
 
-    this.set("destroyingPage", true);
+    this.destroyingPage = true;
 
     this.page
       .destroy()
@@ -134,7 +147,7 @@ export default class PageAdmin extends Component {
         }
       })
       .catch((error) => this.showErrorMessage(error))
-      .finally(() => this.set("destroyingPage", false));
+      .finally(() => (this.destroyingPage = false));
   }
 
   @action
@@ -146,7 +159,7 @@ export default class PageAdmin extends Component {
         link.href = URL.createObjectURL(file);
         link.setAttribute(
           "download",
-          `discourse-${this.page.name.toLowerCase()}.zip`
+          `discourse-${this.page.name.toLowerCase()}.zip`,
         );
         link.click();
       })

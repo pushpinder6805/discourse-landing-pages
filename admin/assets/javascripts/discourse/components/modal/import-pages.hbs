@@ -6,7 +6,7 @@
   <:body>
     <div class="inputs">
       <input
-        onchange={{this.uploadFile}}
+        {{on "change" this.uploadFile}}
         type="file"
         id="file-input"
         accept=".zip,application/zip"

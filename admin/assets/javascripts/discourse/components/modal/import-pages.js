@@ -1,4 +1,5 @@
-import Component from "@ember/component";
+import Component from "@glimmer/component";
+import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
 import { service } from "@ember/service";
 import { popupAjaxError } from "discourse/lib/ajax-error";
@@ -7,28 +8,35 @@ import LandingPage from "../../models/landing-page";
 export default class ImportPages extends Component {
   @service dialog;
 
+  @tracked pageFile;
+  @tracked loading = false;
+
+  get importDisabled() {
+    return !this.pageFile || this.loading;
+  }
+
   @action
-  uploadFile() {
-    this.set("pageFile", document.querySelector("#file-input").files[0]);
+  uploadFile(event) {
+    this.pageFile = event.target.files[0];
   }
 
   @action
   importPage() {
-    let data = new FormData();
+    const data = new FormData();
     data.append("page", this.pageFile);
 
-    this.set("loading", true);
+    this.loading = true;
     LandingPage.import(data)
       .then((result) => {
-        this.closeModal(result);
+        this.args.closeModal(result);
       })
-      .catch(function (e) {
+      .catch((e) => {
         if (typeof e === "string") {
           this.dialog.alert(e);
         } else {
           popupAjaxError(e);
         }
       })
-      .finally(() => this.set("loading", false));
+      .finally(() => (this.loading = false));
   }
 }

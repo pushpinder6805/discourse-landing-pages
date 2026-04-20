@@ -1,14 +1,12 @@
 import EmberObject from "@ember/object";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import discourseComputed from "discourse-common/utils/decorators";
 
 const basePath = "/landing/page";
 
 class LandingPage extends EmberObject {
-  @discourseComputed("id")
-  exportUrl(id) {
-    return `${basePath}/${id}/export`;
+  get exportUrl() {
+    return `${basePath}/${this.id}/export`;
   }
 
   save() {

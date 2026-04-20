@@ -6,17 +6,29 @@
   <:body>
     <div class="url">
       <div class="label">{{i18n "admin.landing_pages.remote.url"}}</div>
-      <Input @value={{this.buffered.url}} placeholder={{this.urlPlaceholder}} />
+      <Input
+        @value={{this.buffered.url}}
+        placeholder={{this.urlPlaceholder}}
+        {{on "input" this.remoteChanged}}
+      />
     </div>
 
     <div class="branch">
       <div class="label">{{i18n "admin.customize.theme.remote_branch"}}</div>
-      <Input @value={{this.buffered.branch}} placeholder="main" />
+      <Input
+        @value={{this.buffered.branch}}
+        placeholder="main"
+        {{on "input" this.remoteChanged}}
+      />
     </div>
 
     <div class="check-private">
       <label>
-        <Input @type="checkbox" @checked={{this.buffered.private}} />
+        <Input
+          @type="checkbox"
+          @checked={{this.buffered.private}}
+          {{on "change" this.privateWasChecked}}
+        />
         {{i18n "admin.landing_pages.remote.private"}}
       </label>
     </div>
