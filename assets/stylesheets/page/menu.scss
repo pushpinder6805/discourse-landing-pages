@@ -76,7 +76,7 @@ body.landing-page {
     z-index: 200;
     background-color: $secondary;
 
-    &:before {
+    &::before {
       backface-visibility: hidden;
       background-color: white;
       border-bottom: 1px solid $primary-medium;
@@ -107,6 +107,7 @@ body.landing-page {
       span.up {
         display: flex;
       }
+
       span.down {
         display: none;
       }
@@ -115,7 +116,7 @@ body.landing-page {
     .menu-dropdown {
       visibility: visible;
 
-      &:before {
+      &::before {
         opacity: 1;
       }
 
@@ -163,7 +164,7 @@ body.landing-page {
       &.coming-soon .image {
         position: relative;
 
-        &:after {
+        &::after {
           content: " ";
           z-index: 10;
           display: block;
@@ -172,7 +173,7 @@ body.landing-page {
           top: 0;
           left: 0;
           right: 0;
-          background: rgba(255, 255, 255, 0.5);
+          background: rgb(255, 255, 255, 0.5);
         }
       }
 
@@ -191,7 +192,7 @@ body.landing-page {
     }
   }
 
-  @media only screen and (max-width: 480px) {
+  @media only screen and (width <= 480px) {
     header.landing-header {
       padding: 10px 20px 10px 13px;
       box-sizing: border-box;
