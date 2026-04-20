@@ -209,7 +209,7 @@ export default class AdminPluginsLandingPages extends Component {
               messages.push(
                 i18n(`admin.landing_pages.imported.x_${listType}`, {
                   count: imported[listType].length,
-                }),
+                })
               );
             }
           });

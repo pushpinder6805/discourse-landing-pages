@@ -125,7 +125,7 @@ export default class PageAdmin extends Component {
   @action
   destroyPage() {
     const hasChildren = this.pages.find(
-      (page) => page.parent_id === this.page.id,
+      (page) => page.parent_id === this.page.id
     );
     if (hasChildren) {
       this.resultMessage = {
@@ -159,7 +159,7 @@ export default class PageAdmin extends Component {
         link.href = URL.createObjectURL(file);
         link.setAttribute(
           "download",
-          `discourse-${this.page.name.toLowerCase()}.zip`,
+          `discourse-${this.page.name.toLowerCase()}.zip`
         );
         link.click();
       })
