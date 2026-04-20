@@ -25,9 +25,8 @@
 
     <%- if @theme_id.present? %>
       <%= discourse_color_scheme_stylesheets %>
-      <%- if @theme_id == 1 %>
-        <%= discourse_stylesheet_link_tag (mobile_view? ? :mobile : :desktop) %>
-      <%- end %>
+      <%= discourse_stylesheet_link_tag (mobile_view? ? :mobile : :desktop) %>
+      <%= discourse_stylesheet_link_tag :common_theme, theme_id: @theme_id %>
       <%= discourse_stylesheet_link_tag (mobile_view? ? :mobile_theme : :desktop_theme), theme_id: @theme_id %>
       <%= theme_lookup("head_tag") %>
     <%- end %>

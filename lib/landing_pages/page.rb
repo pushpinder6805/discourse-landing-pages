@@ -54,7 +54,7 @@ class LandingPages::Page
       data = {}
       self.class.writable_attrs.each { |attr| data[attr] = send(attr) }
 
-      PluginStore.set(LandingPages::PLUGIN_NAME, id, data)
+      PluginStore.set(LandingPages::PLUGIN_NAMESPACE, id, data)
 
       after_save
     else
@@ -72,7 +72,7 @@ class LandingPages::Page
   end
 
   def destroy
-    after_destroy if PluginStore.remove(LandingPages::PLUGIN_NAME, id)
+    after_destroy if PluginStore.remove(LandingPages::PLUGIN_NAMESPACE, id)
   end
 
   def after_destroy
@@ -108,7 +108,7 @@ class LandingPages::Page
   def self.find(page_id)
     return nil if !page_id
 
-    if data = PluginStore.get(LandingPages::PLUGIN_NAME, page_id)
+    if data = PluginStore.get(LandingPages::PLUGIN_NAMESPACE, page_id)
       new(page_id, data)
     else
       nil
@@ -135,7 +135,7 @@ class LandingPages::Page
       query = page_query(attr)
       query += " AND key != '#{exclude_id}'" if exclude_id
     else
-      query = "plugin_name = '#{LandingPages::PLUGIN_NAME}' AND key = ?"
+      query = "plugin_name = '#{LandingPages::PLUGIN_NAMESPACE}' AND key = ?"
     end
 
     ::PluginStoreRow.where(query, value).exists?
@@ -179,7 +179,7 @@ class LandingPages::Page
   end
 
   def self.page_list_query
-    "plugin_name = '#{LandingPages::PLUGIN_NAME}' AND key LIKE 'page_%'"
+    "plugin_name = '#{LandingPages::PLUGIN_NAMESPACE}' AND key LIKE 'page_%'"
   end
 
   def self.page_query(attr)

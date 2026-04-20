@@ -28,7 +28,7 @@ class LandingPages::Remote
     if valid?
       remote = {}
       self.class.writable_attrs.each { |attr| remote[attr] = self.send(attr) }
-      PluginStore.set(LandingPages::PLUGIN_NAME, KEY, remote)
+      PluginStore.set(LandingPages::PLUGIN_NAMESPACE, KEY, remote)
       reset
     end
   end
@@ -77,11 +77,11 @@ class LandingPages::Remote
   end
 
   def self.exists?
-    PluginStoreRow.exists?("plugin_name = '#{LandingPages::PLUGIN_NAME}' AND key = '#{KEY}'")
+    PluginStoreRow.exists?("plugin_name = '#{LandingPages::PLUGIN_NAMESPACE}' AND key = '#{KEY}'")
   end
 
   def self.raw
-    PluginStore.get(LandingPages::PLUGIN_NAME, KEY)
+    PluginStore.get(LandingPages::PLUGIN_NAMESPACE, KEY)
   end
 
   def self.destroy
@@ -99,7 +99,7 @@ class LandingPages::Remote
         end
       end
 
-      PluginStore.remove(LandingPages::PLUGIN_NAME, KEY)
+      PluginStore.remove(LandingPages::PLUGIN_NAMESPACE, KEY)
     end
   end
 end

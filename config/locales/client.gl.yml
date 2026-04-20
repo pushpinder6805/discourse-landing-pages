@@ -12,6 +12,7 @@ gl:
         save: "Gardar"
         destroy: "Eliminar"
         create: "Crear"
+        main: "Principal"
 
         page:
           label: "Páxinas"
@@ -52,6 +53,8 @@ gl:
             label: "Menú"
             instructions: "Enlaces de navegación para a páxina"
             select: "Selecciona un menú…"
+          destroy:
+            has_children: "Esta páxina ten páxinas fillas, móveas ou elimínaas antes."
 
         remote:
           repository:

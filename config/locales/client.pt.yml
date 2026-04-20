@@ -12,6 +12,7 @@ pt:
         save: "Salvar"
         destroy: "Excluir"
         create: "Criar"
+        main: "Principal"
 
         page:
           label: "Páginas"
@@ -52,6 +53,8 @@ pt:
             label: "Menu"
             instructions: "Menu de página"
             select: "Selecionar menu"
+          destroy:
+            has_children: "Esta página tem páginas filhas, por favor mova ou exclua-as antes."
 
         remote:
           repository:

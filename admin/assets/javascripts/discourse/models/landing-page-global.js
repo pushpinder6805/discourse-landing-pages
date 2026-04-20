@@ -3,7 +3,8 @@ import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 
 const basePath = "/landing/global";
-const LandingPageGlobal = EmberObject.extend();
+
+class LandingPageGlobal extends EmberObject {}
 
 LandingPageGlobal.reopenClass({
   save(data) {

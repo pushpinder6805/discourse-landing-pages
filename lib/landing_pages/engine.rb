@@ -6,7 +6,8 @@ module ::LandingPages
     isolate_namespace LandingPages
   end
 
-  PLUGIN_NAME = "landing_pages"
+  PLUGIN_NAME = "discourse-landing-pages"
+  PLUGIN_NAMESPACE = "landing_pages"
   PATHS_KEY = "paths"
   CATEGORY_IDS_KEY = "category_ids"
 

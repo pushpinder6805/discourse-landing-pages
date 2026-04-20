@@ -7,7 +7,7 @@ body.landing-page {
     top: 0;
     z-index: 300;
     background-color: $secondary;
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 2px 4px -1px rgb(0, 0, 0, 0.25);
     min-height: 80px;
 
     .contents {
@@ -74,7 +74,7 @@ body.landing-page {
     margin: 0 0 0.5em 0;
   }
 
-  @media only screen and (max-width: 480px) {
+  @media only screen and (width <= 480px) {
     header.landing-header {
       padding: 10px 20px 10px 13px;
       box-sizing: border-box;

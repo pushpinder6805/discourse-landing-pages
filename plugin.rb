@@ -2,7 +2,7 @@
 
 # name: discourse-landing-pages
 # about: Adds landing pages to Discourse
-# version: 0.4.0
+# version: 0.5.0
 # authors: Angus McLeod, Pablo Cabido
 # url: https://github.com/paviliondev/discourse-landing-pages
 
@@ -16,7 +16,7 @@ if respond_to?(:register_svg_icon)
   register_svg_icon "code-commit"
 end
 
-add_admin_route "admin.landing_pages.title", "landing-pages"
+add_admin_route "admin.landing_pages.title", "discourse-landing-pages", use_new_show_route: true
 
 extend_content_security_policy(script_src: ["https://ajax.googleapis.com"])
 

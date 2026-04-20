@@ -12,6 +12,7 @@ es:
         save: "Guardar"
         destroy: "Eliminar"
         create: "Crear"
+        main: "Principal"
 
         page:
           label: "Páginas"
@@ -52,6 +53,8 @@ es:
             label: "Menú"
             instructions: "Enlaces de navegación para la página"
             select: "Selecciona un menú…"
+          destroy:
+            has_children: "Esta página tiene páginas hijas, muévelas o elimínalas antes."
 
         remote:
           repository:

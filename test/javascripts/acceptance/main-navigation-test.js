@@ -5,6 +5,9 @@ import { click, visit } from "@ember/test-helpers";
 acceptance("Main | Navigation", function (needs) {
   needs.user();
   needs.pretender((server, helper) => {
+    server.get("/admin/plugins/discourse-landing-pages.json", () => {
+      return helper.response({ name: "name", description: "description" });
+    });
     server.get("/landing/page", () => {
       return helper.response({
         pages: [{ id: "page_0", name: "test", path: "test" }],
@@ -13,7 +16,7 @@ acceptance("Main | Navigation", function (needs) {
   });
 
   test("Displays only the pages section when selected", async function (assert) {
-    await visit("/admin/plugins/landing-pages");
+    await visit("/admin/plugins/discourse-landing-pages/main");
     await click("button.pages");
 
     assert.ok(exists(".page-list-container"));
@@ -23,7 +26,7 @@ acceptance("Main | Navigation", function (needs) {
   });
 
   test("Displays only the global section when selected", async function (assert) {
-    await visit("/admin/plugins/landing-pages");
+    await visit("/admin/plugins/discourse-landing-pages/main");
     await click("button.global");
 
     assert.notOk(exists(".page-list-container"));
@@ -33,7 +36,7 @@ acceptance("Main | Navigation", function (needs) {
   });
 
   test("Displays only the update remote modal over the default section", async function (assert) {
-    await visit("/admin/plugins/landing-pages");
+    await visit("/admin/plugins/discourse-landing-pages/main");
     await click("button.remote");
 
     assert.ok(exists(".page-list-container"));
@@ -43,7 +46,7 @@ acceptance("Main | Navigation", function (needs) {
   });
 
   test("Displays only the import pages modal over the default section", async function (assert) {
-    await visit("/admin/plugins/landing-pages");
+    await visit("/admin/plugins/discourse-landing-pages/main");
     await click("button.import");
 
     assert.ok(exists(".page-list-container"));

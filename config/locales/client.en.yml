@@ -12,6 +12,7 @@ en:
         save: "Save"
         destroy: "Delete"
         create: "Create"
+        main: "Main"
 
         page:
           label: "Pages"
@@ -52,6 +53,8 @@ en:
             label: "Menu"
             instructions: "Page menu"
             select: "Select menu…"
+          destroy:
+            has_children: "This page has child pages, please move or delete them before deleting this page."
         
         remote:
           repository:

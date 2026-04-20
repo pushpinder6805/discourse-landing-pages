@@ -3,6 +3,10 @@
 class LandingPages::AdminController < ::Admin::AdminController
   requires_plugin LandingPages::PLUGIN_NAME
 
+  def show
+    render body: nil
+  end
+
   private
 
   def check_page_exists

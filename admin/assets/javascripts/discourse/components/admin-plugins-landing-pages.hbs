@@ -1,7 +1,7 @@
 <div class="page-controls">
   <div class="buttons">
     <DButton
-      @action={{action "toggleShowPages"}}
+      @action={{this.toggleShowPages}}
       @label="admin.landing_pages.page.label"
       @title="admin.landing_pages.page.description"
       @icon="file"
@@ -9,7 +9,7 @@
     />
 
     <DButton
-      @action={{action "toggleShowGlobal"}}
+      @action={{this.toggleShowGlobal}}
       @label="admin.landing_pages.global.label"
       @title="admin.landing_pages.global.description"
       @icon="globe"
@@ -28,7 +28,7 @@
     {{/if}}
 
     <DButton
-      @action={{action "pullFromRemote"}}
+      @action={{this.pullFromRemote}}
       @label="admin.landing_pages.remote.pull.label"
       @title="admin.landing_pages.remote.pull.description"
       @icon="arrow-down"
@@ -37,7 +37,7 @@
     />
 
     <DButton
-      @action={{action "updateRemote"}}
+      @action={{this.updateRemote}}
       @title="admin.landing_pages.remote.repository.description"
       @label="admin.landing_pages.remote.repository.label"
       @icon="book"
@@ -45,7 +45,7 @@
     />
 
     <DButton
-      @action={{action "importPages"}}
+      @action={{this.importPages}}
       @label="admin.landing_pages.import.button"
       @title="admin.landing_pages.import.description"
       @icon="download"
@@ -83,6 +83,6 @@
     @themes={{this.themes}}
     @groups={{this.groups}}
     @menus={{this.menus}}
-    @updatePages={{action "updatePages"}}
+    @updatePages={{this.updatePages}}
   />
 {{/if}}
