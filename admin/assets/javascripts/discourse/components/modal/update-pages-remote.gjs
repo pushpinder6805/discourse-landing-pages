@@ -2,18 +2,21 @@ import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
 import { on } from "@ember/modifier";
-import BufferedProxy from "ember-buffered-proxy/proxy";
 import DButton from "discourse/components/d-button";
 import DModal from "discourse/components/d-modal";
 import DModalCancel from "discourse/components/d-modal-cancel";
-import loadingSpinner from "discourse/helpers/loading-spinner";
+import ConditionalLoadingSpinner from "discourse/components/conditional-loading-spinner";
 import icon from "discourse/helpers/d-icon";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import { i18n } from "discourse-i18n";
 
 export default class UpdatePagesRemote extends Component {
-  @tracked buffered;
+  @tracked url;
+  @tracked branch;
+  @tracked isPrivate;
+  @tracked publicKey;
+  @tracked privateKey;
   @tracked tested;
   @tracked testing = false;
   @tracked updating = false;
@@ -27,13 +30,20 @@ export default class UpdatePagesRemote extends Component {
 
   constructor() {
     super(...arguments);
-    this.buffered = BufferedProxy.create({
-      content: this.args.model.remote,
-    });
+    const remote = this.args.model.remote;
+    this.url = remote.url || "";
+    this.branch = remote.branch || "";
+    this.isPrivate = remote.private || false;
+    this.publicKey = remote.public_key || "";
+    this.privateKey = remote.private_key || "";
+  }
+
+  get connected() {
+    return this.args.model.remote.connected;
   }
 
   get showPublicKey() {
-    return this.buffered.private && this.buffered.public_key;
+    return this.isPrivate && this.publicKey;
   }
 
   get loading() {
@@ -45,15 +55,15 @@ export default class UpdatePagesRemote extends Component {
   }
 
   get resetDisabled() {
-    return !this.buffered.connected || this.loading;
+    return !this.connected || this.loading;
   }
 
   get testDisabled() {
-    return !this.buffered.url || this.loading;
+    return !this.url || this.loading;
   }
 
   get urlPlaceholder() {
-    return this.buffered.private ? this.sshPlaceholder : this.httpsPlaceholder;
+    return this.isPrivate ? this.sshPlaceholder : this.httpsPlaceholder;
   }
 
   get testIcon() {
@@ -65,28 +75,29 @@ export default class UpdatePagesRemote extends Component {
   }
 
   @action
-  remoteChanged() {
+  onUrlChange(event) {
+    this.url = event.target.value;
+    this.tested = null;
+  }
+
+  @action
+  onBranchChange(event) {
+    this.branch = event.target.value;
     this.tested = null;
   }
 
   @action
   privateWasChecked(event) {
-    this.buffered.set("private", event.target.checked);
-    this.remoteChanged();
+    this.isPrivate = event.target.checked;
+    this.tested = null;
 
-    if (
-      this.buffered.get("private") &&
-      !this.buffered.get("public_key") &&
-      !this.keyLoading
-    ) {
+    if (this.isPrivate && !this.publicKey && !this.keyLoading) {
       this.keyLoading = true;
 
       ajax(this.keyGenUrl, { type: "POST" })
         .then((result) => {
-          this.buffered.setProperties({
-            private_key: result.private_key,
-            public_key: result.public_key,
-          });
+          this.privateKey = result.private_key;
+          this.publicKey = result.public_key;
         })
         .catch(popupAjaxError)
         .finally(() => (this.keyLoading = false));
@@ -94,14 +105,12 @@ export default class UpdatePagesRemote extends Component {
   }
 
   buildData() {
-    this.buffered.applyChanges();
-    const remote = this.args.model.remote;
     return {
       remote: {
-        url: remote.url,
-        branch: remote.branch,
-        ...(remote.private && { private_key: remote.private_key }),
-        ...(remote.private && { public_key: remote.public_key }),
+        url: this.url,
+        branch: this.branch,
+        ...(this.isPrivate && { private_key: this.privateKey }),
+        ...(this.isPrivate && { public_key: this.publicKey }),
       },
     };
   }
@@ -131,7 +140,6 @@ export default class UpdatePagesRemote extends Component {
     })
       .then((result) => {
         this.args.closeModal(result);
-        this.args.model.remote = {};
       })
       .catch(popupAjaxError)
       .finally(() => (this.updating = false));
@@ -146,7 +154,6 @@ export default class UpdatePagesRemote extends Component {
     })
       .then(() => {
         this.args.closeModal({ remote: {} });
-        this.args.model.remote = {};
       })
       .catch(popupAjaxError)
       .finally(() => (this.resetting = false));
@@ -163,9 +170,9 @@ export default class UpdatePagesRemote extends Component {
           <div class="label">{{i18n "admin.landing_pages.remote.url"}}</div>
           <input
             type="text"
-            value={{this.buffered.url}}
+            value={{this.url}}
             placeholder={{this.urlPlaceholder}}
-            {{on "input" this.remoteChanged}}
+            {{on "input" this.onUrlChange}}
           />
         </div>
 
@@ -173,9 +180,9 @@ export default class UpdatePagesRemote extends Component {
           <div class="label">{{i18n "admin.customize.theme.remote_branch"}}</div>
           <input
             type="text"
-            value={{this.buffered.branch}}
+            value={{this.branch}}
             placeholder="main"
-            {{on "input" this.remoteChanged}}
+            {{on "input" this.onBranchChange}}
           />
         </div>
 
@@ -183,7 +190,7 @@ export default class UpdatePagesRemote extends Component {
           <label>
             <input
               type="checkbox"
-              checked={{this.buffered.private}}
+              checked={{this.isPrivate}}
               {{on "change" this.privateWasChecked}}
             />
             {{i18n "admin.landing_pages.remote.private"}}
@@ -193,7 +200,7 @@ export default class UpdatePagesRemote extends Component {
         {{#if this.showPublicKey}}
           <div class="public-key">
             <div class="label">{{i18n "admin.customize.theme.public_key"}}</div>
-            <textarea readonly>{{this.buffered.public_key}}</textarea>
+            <textarea readonly>{{this.publicKey}}</textarea>
           </div>
         {{/if}}
       </:body>
@@ -221,7 +228,7 @@ export default class UpdatePagesRemote extends Component {
         />
 
         {{#if this.loading}}
-          {{loadingSpinner size="small"}}
+          <ConditionalLoadingSpinner @condition={{true}} @size="small" />
         {{else}}
           {{#if this.testIcon}}
             {{icon this.testIcon class=this.tested}}

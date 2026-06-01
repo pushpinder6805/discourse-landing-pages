@@ -1,17 +1,16 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
-import { fn, hash } from "@ember/helper";
+import { hash } from "@ember/helper";
 import { on } from "@ember/modifier";
 import { dasherize } from "@ember/string";
 import AceEditor from "discourse/components/ace-editor";
 import CategoryChooser from "discourse/components/category-chooser";
 import ComboBox from "select-kit/components/combo-box";
-import loadingSpinner from "discourse/helpers/loading-spinner";
+import ConditionalLoadingSpinner from "discourse/components/conditional-loading-spinner";
 import DButton from "discourse/components/d-button";
 import GroupChooser from "select-kit/components/group-chooser";
 import icon from "discourse/helpers/d-icon";
-import { Input, Textarea } from "@ember/component";
 import { extractError } from "discourse/lib/ajax-error";
 import { i18n } from "discourse-i18n";
 import LandingPage from "../models/landing-page";
@@ -99,6 +98,11 @@ export default class PageAdmin extends Component {
   }
 
   @action
+  onChangeName(event) {
+    this.page.name = event.target.value;
+  }
+
+  @action
   onChangeParent(pageId) {
     this.page.parent_id = pageId;
   }
@@ -176,6 +180,31 @@ export default class PageAdmin extends Component {
       .catch((error) => this.showErrorMessage(error));
   }
 
+  @action
+  onChangeMenu(value) {
+    this.page.menu = value;
+  }
+
+  @action
+  onChangeTheme(value) {
+    this.page.theme_id = value;
+  }
+
+  @action
+  onChangeGroups(value) {
+    this.page.group_ids = value;
+  }
+
+  @action
+  onChangeCategory(value) {
+    this.page.category_id = value;
+  }
+
+  @action
+  onChangeBody(value) {
+    this.page.body = value;
+  }
+
   <template>
     <div class="page-controls">
       <div class="page-list-container">
@@ -218,7 +247,7 @@ export default class PageAdmin extends Component {
           {{/if}}
 
           {{#if this.updatingPage}}
-            {{loadingSpinner size="small"}}
+            <ConditionalLoadingSpinner @condition={{true}} @size="small" />
           {{/if}}
 
           {{#if this.page.id}}
@@ -261,7 +290,12 @@ export default class PageAdmin extends Component {
             {{i18n "admin.landing_pages.page.name.label"}}
           </label>
 
-          <Input @value={{this.page.name}} class="page-name" />
+          <input
+            type="text"
+            value={{this.page.name}}
+            {{on "input" this.onChangeName}}
+            class="page-name"
+          />
 
           <div class="control-instructions">
             {{i18n "admin.landing_pages.page.name.instructions"}}
@@ -273,8 +307,9 @@ export default class PageAdmin extends Component {
             {{i18n "admin.landing_pages.page.path.label"}}
           </label>
 
-          <Input
-            @value={{this.pagePath}}
+          <input
+            type="text"
+            value={{this.pagePath}}
             disabled={{this.hasParent}}
             {{on "input" this.onChangePath}}
             class="page-path"
@@ -313,7 +348,7 @@ export default class PageAdmin extends Component {
             @value={{this.page.menu}}
             @valueProperty="name"
             @nameProperty="name"
-            @onChange={{fn (mut this.page.menu)}}
+            @onChange={{this.onChangeMenu}}
             class="menu-select"
             @options={{hash none="admin.landing_pages.page.menu.select"}}
           />
@@ -333,7 +368,7 @@ export default class PageAdmin extends Component {
           <ComboBox
             @content={{this.themes}}
             @value={{this.page.theme_id}}
-            @onChange={{fn (mut this.page.theme_id)}}
+            @onChange={{this.onChangeTheme}}
             class="theme-select"
             @options={{hash none="admin.landing_pages.page.theme.select"}}
           />
@@ -353,7 +388,7 @@ export default class PageAdmin extends Component {
             @content={{this.groups}}
             @value={{this.page.group_ids}}
             @labelProperty="name"
-            @onChange={{fn (mut this.page.group_ids)}}
+            @onChange={{this.onChangeGroups}}
           />
 
           <div class="control-instructions">
@@ -369,7 +404,7 @@ export default class PageAdmin extends Component {
           <CategoryChooser
             class="category-select"
             @value={{this.page.category_id}}
-            @onChange={{fn (mut this.page.category_id)}}
+            @onChange={{this.onChangeCategory}}
             @options={{hash
               clearable=true
               disabled=this.hasParent
@@ -394,7 +429,7 @@ export default class PageAdmin extends Component {
 
         <AceEditor
           @content={{this.page.body}}
-          @onChange={{fn (mut this.page.body)}}
+          @onChange={{this.onChangeBody}}
           @mode="html"
         />
       </div>

@@ -1,4 +1,3 @@
-import { hash } from "@ember/helper";
 import icon from "discourse/helpers/d-icon";
 import { i18n } from "discourse-i18n";
 

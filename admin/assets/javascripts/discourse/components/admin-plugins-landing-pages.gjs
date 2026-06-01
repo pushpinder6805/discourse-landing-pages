@@ -8,7 +8,7 @@ import Group from "discourse/models/group";
 import { i18n } from "discourse-i18n";
 import DButton from "discourse/components/d-button";
 import icon from "discourse/helpers/d-icon";
-import loadingSpinner from "discourse/helpers/loading-spinner";
+import ConditionalLoadingSpinner from "discourse/components/conditional-loading-spinner";
 import ImportPages from "./modal/import-pages.gjs";
 import UpdatePagesRemote from "./modal/update-pages-remote.gjs";
 import GlobalAdmin from "./global-admin.gjs";
@@ -297,7 +297,7 @@ export default class AdminPluginsLandingPages extends Component {
 
       <div class="buttons">
         {{#if this.pullingFromRemote}}
-          {{loadingSpinner size="small"}}
+          <ConditionalLoadingSpinner @condition={{true}} @size="small" />
         {{else if this.showCommitsBehind}}
           {{i18n
             "admin.landing_pages.remote.repository.x_commits_behind"

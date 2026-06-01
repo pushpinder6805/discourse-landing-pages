@@ -4,7 +4,7 @@ import { popupAjaxError } from "discourse/lib/ajax-error";
 
 const basePath = "/landing/page";
 
-class LandingPage extends EmberObject {
+export default class LandingPage extends EmberObject {
   get exportUrl() {
     return `${basePath}/${this.id}/export`;
   }
@@ -46,31 +46,21 @@ class LandingPage extends EmberObject {
       },
     });
   }
-}
 
-LandingPage.reopenClass({
-  all() {
+  static all() {
     return ajax(basePath).catch(popupAjaxError);
-  },
+  }
 
-  find(pageId) {
+  static find(pageId) {
     return ajax(`${basePath}/${pageId}`).catch(popupAjaxError);
-  },
+  }
 
-  create(props = {}) {
-    const page = this._super.apply(this);
-    page.setProperties(props);
-    return page;
-  },
-
-  import(data) {
+  static import(data) {
     return ajax(`${basePath}/upload`, {
       type: "POST",
       processData: false,
       contentType: false,
       data,
     });
-  },
-});
-
-export default LandingPage;
+  }
+}
