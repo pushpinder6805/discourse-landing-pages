@@ -19,7 +19,7 @@ class LandingPages::LandingController < ::ActionController::Base
   before_action :ensure_can_change_subscription, only: [:subscription]
   before_action :find_category_user, only: [:subscription]
 
-  helper_method :list_item_html, :list_topics
+  helper_method :list_item_html, :list_topics, :path, :mobile_view?
 
   def show
     if @page.present?
@@ -37,7 +37,12 @@ class LandingPages::LandingController < ::ActionController::Base
         render json: { page: @page.body }
       else
         if !SiteSetting.landing_redirect_to_homepages || visit_from_crawler?
-          render inline: @page.body, layout: "landing"
+          begin
+            render inline: @page.body, layout: "landing"
+          rescue => e
+            Rails.logger.error "LandingPages render error: #{e.class}: #{e.message}\n#{e.backtrace&.first(10)&.join("\n")}"
+            raise
+          end
         else
           homepages_root_path =
             "/#{SiteSetting.landing_redirect_to_homepages_root_path}/#{request.path.split("/").last}"
@@ -51,6 +56,10 @@ class LandingPages::LandingController < ::ActionController::Base
 
   def path(p)
     "#{Discourse.base_url}#{p}"
+  end
+
+  def mobile_view?
+    MobileDetection.resolve_mobile_view!(request.user_agent, params, session)
   end
 
   def visit_from_crawler?
