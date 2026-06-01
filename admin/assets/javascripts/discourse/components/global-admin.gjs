@@ -1,9 +1,8 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
-import { on } from "@ember/modifier";
 import DButton from "discourse/components/d-button";
-import ConditionalLoadingSpinner from "discourse/components/conditional-loading-spinner";
+import loadingSpinner from "discourse/helpers/loading-spinner";
 import ValueList from "discourse/components/value-list";
 import icon from "discourse/helpers/d-icon";
 import { i18n } from "discourse-i18n";
@@ -115,7 +114,9 @@ export default class GlobalAdmin extends Component {
           {{icon this.resultIcon}}
         {{/if}}
 
-        <ConditionalLoadingSpinner @condition={{this.updatingGlobal}} @size="small" />
+        {{#if this.updatingGlobal}}
+          {{loadingSpinner size="small"}}
+        {{/if}}
 
         <DButton
           @action={{this.destroyGlobal}}

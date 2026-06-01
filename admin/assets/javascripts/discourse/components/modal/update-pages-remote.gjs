@@ -6,7 +6,7 @@ import BufferedProxy from "ember-buffered-proxy/proxy";
 import DButton from "discourse/components/d-button";
 import DModal from "discourse/components/d-modal";
 import DModalCancel from "discourse/components/d-modal-cancel";
-import LoadingSpinner from "discourse/components/loading-spinner";
+import loadingSpinner from "discourse/helpers/loading-spinner";
 import icon from "discourse/helpers/d-icon";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
@@ -221,7 +221,7 @@ export default class UpdatePagesRemote extends Component {
         />
 
         {{#if this.loading}}
-          <LoadingSpinner @size="small" />
+          {{loadingSpinner size="small"}}
         {{else}}
           {{#if this.testIcon}}
             {{icon this.testIcon class=this.tested}}

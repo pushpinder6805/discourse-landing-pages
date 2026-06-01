@@ -7,7 +7,7 @@ import { dasherize } from "@ember/string";
 import AceEditor from "discourse/components/ace-editor";
 import CategoryChooser from "discourse/components/category-chooser";
 import ComboBox from "select-kit/components/combo-box";
-import ConditionalLoadingSpinner from "discourse/components/conditional-loading-spinner";
+import loadingSpinner from "discourse/helpers/loading-spinner";
 import DButton from "discourse/components/d-button";
 import GroupChooser from "select-kit/components/group-chooser";
 import icon from "discourse/helpers/d-icon";
@@ -217,7 +217,9 @@ export default class PageAdmin extends Component {
             </span>
           {{/if}}
 
-          <ConditionalLoadingSpinner @condition={{this.updatingPage}} @size="small" />
+          {{#if this.updatingPage}}
+            {{loadingSpinner size="small"}}
+          {{/if}}
 
           {{#if this.page.id}}
             <DButton
