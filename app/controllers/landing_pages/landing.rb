@@ -16,10 +16,17 @@ class LandingPages::LandingController < ::ActionController::Base
   before_action :find_menu, only: [:show]
   before_action :find_assets, only: [:show]
   before_action :load_theme, only: [:show]
+  before_action :set_mobile_view, only: [:show]
   before_action :ensure_can_change_subscription, only: [:subscription]
   before_action :find_category_user, only: [:subscription]
 
-  helper_method :list_item_html, :list_topics, :path, :mobile_view?
+  helper_method :list_item_html, :list_topics, :path
+
+  helper do
+    def mobile_view?
+      @mobile_view
+    end
+  end
 
   def show
     if @page.present?
@@ -59,7 +66,7 @@ class LandingPages::LandingController < ::ActionController::Base
   end
 
   def mobile_view?
-    MobileDetection.resolve_mobile_view!(request.user_agent, params, session)
+    @mobile_view ||= MobileDetection.mobile_device?(request.user_agent)
   end
 
   def visit_from_crawler?
@@ -115,6 +122,10 @@ class LandingPages::LandingController < ::ActionController::Base
   end
 
   private
+
+  def set_mobile_view
+    @mobile_view = MobileDetection.mobile_device?(request.user_agent)
+  end
 
   def find_global
     @global = LandingPages::Global.find
