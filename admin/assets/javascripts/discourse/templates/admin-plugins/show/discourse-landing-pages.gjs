@@ -1,4 +1,4 @@
-import AdminPluginsLandingPages from "../../../components/admin-plugins-landing-pages.gjs";
+import AdminPluginsLandingPages from "../../../components/admin-plugins-landing-pages";
 
 const DiscourseAdminLandingPages = <template>
   <AdminPluginsLandingPages @model={{@model}} />

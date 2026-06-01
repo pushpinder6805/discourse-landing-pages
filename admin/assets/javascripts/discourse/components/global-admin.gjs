@@ -1,9 +1,9 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
+import { on } from "@ember/modifier";
 import DButton from "discourse/components/d-button";
 import ConditionalLoadingSpinner from "discourse/components/conditional-loading-spinner";
-import ValueList from "discourse/components/value-list";
 import icon from "discourse/helpers/d-icon";
 import { i18n } from "discourse-i18n";
 import JsonEditor from "./json-editor";
@@ -19,6 +19,7 @@ export default class GlobalAdmin extends Component {
   @tracked jsonHeaderError;
   @tracked jsonFooterError;
   @tracked resultIcon;
+  @tracked newScriptValue = "";
 
   constructor() {
     super(...arguments);
@@ -27,13 +28,45 @@ export default class GlobalAdmin extends Component {
   }
 
   initializeProps() {
-    this.scripts = this.global?.scripts;
+    this.scripts = this.global?.scripts || [];
     this.jsonHeader = JSON.stringify(this.global?.header || undefined, null, 4);
     this.jsonFooter = JSON.stringify(this.global?.footer || undefined, null, 4);
   }
 
   get updatingGlobal() {
     return this.destroyingGlobal || this.savingGlobal;
+  }
+
+  get scriptItems() {
+    if (!this.scripts) {
+      return [];
+    }
+    if (Array.isArray(this.scripts)) {
+      return this.scripts;
+    }
+    return this.scripts.split("|").filter(Boolean);
+  }
+
+  @action
+  onNewScriptInput(event) {
+    this.newScriptValue = event.target.value;
+  }
+
+  @action
+  addScript() {
+    if (!this.newScriptValue.trim()) {
+      return;
+    }
+    const items = [...this.scriptItems, this.newScriptValue.trim()];
+    this.scripts = items;
+    this.newScriptValue = "";
+  }
+
+  @action
+  removeScript(index) {
+    const items = [...this.scriptItems];
+    items.splice(index, 1);
+    this.scripts = items;
   }
 
   @action
@@ -65,7 +98,7 @@ export default class GlobalAdmin extends Component {
 
     const data = {
       global: {
-        scripts: this.scripts,
+        scripts: this.scriptItems,
         header,
         footer,
       },
@@ -141,7 +174,36 @@ export default class GlobalAdmin extends Component {
           {{i18n "admin.landing_pages.global.scripts.label"}}
         </label>
 
-        <ValueList @values={{this.scripts}} @inputType="array" />
+        <div class="value-list">
+          <div class="value-list-input">
+            <input
+              type="text"
+              value={{this.newScriptValue}}
+              placeholder="https://example.com/script.js"
+              {{on "input" this.onNewScriptInput}}
+            />
+            <DButton
+              @action={{this.addScript}}
+              @icon="plus"
+              class="btn-primary btn-small"
+            />
+          </div>
+          {{#if this.scriptItems.length}}
+            <div class="values">
+              {{#each this.scriptItems as |item index|}}
+                <div class="value">
+                  <span class="value-text">{{item}}</span>
+                  <DButton
+                    @action={{this.removeScript}}
+                    @actionParam={{index}}
+                    @icon="xmark"
+                    class="btn-flat btn-small remove-value-btn"
+                  />
+                </div>
+              {{/each}}
+            </div>
+          {{/if}}
+        </div>
 
         <div class="control-instructions">
           {{! eslint-disable-next-line no-triple-curlies }}

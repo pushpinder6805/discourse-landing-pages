@@ -9,10 +9,10 @@ import { i18n } from "discourse-i18n";
 import DButton from "discourse/components/d-button";
 import icon from "discourse/helpers/d-icon";
 import ConditionalLoadingSpinner from "discourse/components/conditional-loading-spinner";
-import ImportPages from "./modal/import-pages.gjs";
-import UpdatePagesRemote from "./modal/update-pages-remote.gjs";
-import GlobalAdmin from "./global-admin.gjs";
-import PageAdmin from "./page-admin.gjs";
+import ImportPages from "./modal/import-pages";
+import UpdatePagesRemote from "./modal/update-pages-remote";
+import GlobalAdmin from "./global-admin";
+import PageAdmin from "./page-admin";
 
 const statusIcons = {
   error: "exclamation-triangle",
